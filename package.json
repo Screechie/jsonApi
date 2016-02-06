@@ -1,0 +1,11 @@
+{
+  "name": "jsonapi",
+  "version": "0.0.0",
+  "description": "Json API Project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Simeon Bourne",
+  "license": "ISC"
+}
