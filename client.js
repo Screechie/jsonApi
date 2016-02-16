@@ -6,26 +6,38 @@ $(function() {
 			id: 0
 		}
 
-		$("button#addItem").on("click",function(event){
+		$("#addItem").on("click",function(event){
 			event.preventDefault();
 			//Ensure that empty items are not added
 			if($("#item").val() === ""){
-				alert("Empty fields are not allowed! Please enter an item.")
+				alert("Empty fields are not allowed! Please enter an item.");
 			}
 			else{
 				current_item.itemName = $("#item").val();
 				current_item.id = current_item.id + 1;
-				$.post("http://localhost:3000",current_item,function(data){
-					console.log(data);
+				$.post("http://localhost:3000/",current_item,function(data){
 					console.log(current_item.itemName+" added!");
 				});
+				// $.post("/", JSON.stringify(current_item)).done(function ( data ) {
+				// console.log(data);
+				// });
+
+				$("#item").val("");//clear input field after submit
 			}
 		});
 
 		$("button#delItem").on("click", function(event){
 			event.preventDefault();
 
-			$.post("http://localhost:3000")
+			$.ajax({
+				url: "http://localhost:3000",
+				type: "DELETE",
+				success: function(id){
+					//Pass id to be deleted to the server
+
+				}
+			});
+
 
 		});
 	});
