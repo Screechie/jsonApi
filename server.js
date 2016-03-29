@@ -99,7 +99,7 @@ var server = http.createServer(function(request, response){
 		
 	}
 
-	else if(request.method == 'POST' && request.url == '/'){
+	else if(request.method === 'POST' && request.url === '/'){
 
 		var str = "";
 
@@ -154,8 +154,27 @@ var server = http.createServer(function(request, response){
 
 	}
 
-	else if(request.method == 'DELETE'){
+	else if(request.method === 'DELETE'){
 
+		var id = url.parse(request.url).pathname.split('/')[2];
+
+		if(request.url === '/'){
+			console.log("Deleting all items is dangerous!!");
+			console.log("Are you sure you want to continue?");
+		}
+
+		if(request.url === '/items/'+id+'/delete'){
+
+			console.log("A delete request was made to delete id "+id+"!");
+
+			for(i=0; i<items.length; i++){
+				if(idExists(id)){
+					items[i].id = "";
+					items[i].itemName = "";
+				}
+			}	
+		}
+		
 		//Parse url to obtain ID to be deleted from query string
 
 		
