@@ -7,11 +7,19 @@ var qs = require('querystring');//Allow users to perform Get requests using quer
 var items = [];
 var root = __dirname;//Get root directory
 
-console.log("root: "+root);
-// console.log("url object: "+url);
+function idExists(searchId){
+
+		for(i=0; i<items.length;i++){
+			if(items[i].id === searchId)
+				return true;
+		}
+
+	} 
+
 
 var server = http.createServer(function(request, response){
 
+	
 	//Prevent browser from making favicon request
 	if(request.url === '/favicon.ico'){
 		response.writeHead(200, {"Content-Type" : "image/x-icon" });
@@ -20,7 +28,7 @@ var server = http.createServer(function(request, response){
 	}
 	
 	
-	if(request.method == 'GET'){
+	if(request.method === 'GET'){
 
 		var reqUrl = request.url;
 		console.log(reqUrl);
@@ -34,21 +42,14 @@ var server = http.createServer(function(request, response){
 		console.log("path: "+ path);
 
 		//Get all items
-		if(reqUrl = '/'){
-			// for(i=0;i<items.length;i++)
-			// response.write(JSON.stringify({"todo_items": items[i]}));
-
-			var stream = fs.createReadStream(path); 
-			stream.on('data', function (chunk){
-				response.write(chunk);
-			});
-
-			stream.on('end', function () {
-				response.end();
-			});
+		if(reqUrl === '/'){
+			
+			request.setEncoding('utf8');
+			response.end(JSON.stringify(items));			
 		}
+		//Get items specified in query string
 		else{
-			//Get items specified in query string
+			
 		}
 
 		
@@ -128,11 +129,16 @@ var server = http.createServer(function(request, response){
 				//Needs to be inside loop in order for a new object to be created on each iteration
 				var currentItem = new list_Item();
 
-				var id = i + 1;				
+				var id = i + 1;
 
 				//set values of current item for each item
 				currentItem.itemName = item[i];
-				currentItem.id = id;	
+				currentItem.id = id;
+
+				//Check if id already exists in the array and change it if necessary to avoid duplicates
+				if(idExists(id))
+					currentItem.id = items[items.length - 1].id + 1;
+
 				items.push(currentItem);
 			}			
 

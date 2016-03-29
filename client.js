@@ -1,5 +1,5 @@
 $(function() {
-		//Comment Change
+		
 	$("form").submit(function(event){
 		event.preventDefault();	
 		var current_item ={
