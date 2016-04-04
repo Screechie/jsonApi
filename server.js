@@ -8,48 +8,62 @@ var items = [];
 var root = __dirname;//Get root directory
 
 function idExists(searchId){
-
 		for(i=0; i<items.length;i++){
 			if(items[i].id === searchId)
 				return true;
 		}
-
+		return false;
 	} 
 
-
 var server = http.createServer(function(request, response){
-
 	
 	//Prevent browser from making favicon request
 	if(request.url === '/favicon.ico'){
 		response.writeHead(200, {"Content-Type" : "image/x-icon" });
 		response.end();
 		return;
-	}
-	
+	}	
 	
 	if(request.method === 'GET'){
 
 		var reqUrl = request.url;
-		console.log(reqUrl);
-		console.log(typeof root);
-
+		
 		parsedUrl = url.parse(reqUrl);
-		console.log(parsedUrl);
-		console.log( typeof parsedUrl.pathname);
+		// console.log(parsedUrl);
+		// console.log( typeof parsedUrl.pathname);
 
 		var path = join(root, parsedUrl.pathname);
-		console.log("path: "+ path);
-
+		//console.log("path: "+ path);
+		var id = url.parse(request.url).pathname.split('/')[2];
+		console.log(reqUrl);
 		//Get all items
-		if(reqUrl === '/'){
-			
+		if(reqUrl === '/'){			
 			request.setEncoding('utf8');
-			response.end(JSON.stringify(items));			
+			response.end(JSON.stringify(items));				
 		}
-		//Get items specified in query string
-		else{
-			
+		//Get a specific item
+		else if(reqUrl === '/items/'+id){
+			// console.log(typeof id);
+			// console.log(id);
+			var item;
+
+			for(i=0; i<items.length; i++){
+					if(idExists(parseInt(id))){
+						item = JSON.stringify(items[i]);
+						break;
+						//response.end(JSON.stringify(items[i]));	
+					}
+					// else{
+					// 	response.end("Item not found!");
+					// }				
+				}
+			//response.end();	
+				if(item == undefined){
+					response.end(JSON.stringify({"error": "Item not found"}));
+				}
+				else{
+					response.end(item);
+				}
 		}
 
 		
@@ -171,12 +185,11 @@ var server = http.createServer(function(request, response){
 
 				for(i=0; i<items.length; i++){
 					if(idExists(id)){
-						items[i].id = "";
-						items[i].itemName = "";
+						items.splice(parseInt(id)-1,1);
 					}
 				}	
 			}
-
+			response.end("Item "+id+" has been deleted!");
 		});
 	
 		
