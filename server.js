@@ -170,8 +170,6 @@ var server = http.createServer(function(request, response){
 
 	else if(request.method === 'DELETE'){
 
-		request.on("end", function(){
-			
 			var id = url.parse(request.url).pathname.split('/')[2];
 
 			if(request.url === '/'){
@@ -184,13 +182,14 @@ var server = http.createServer(function(request, response){
 				console.log("A delete request was made to delete id "+id+"!");
 
 				for(i=0; i<items.length; i++){
-					if(idExists(id)){
+					if(idExists(parseInt(id))){
 						items.splice(parseInt(id)-1,1);
+						break;
 					}
 				}	
 			}
 			response.end("Item "+id+" has been deleted!");
-		});
+		
 	
 		
 		//Parse url to obtain ID to be deleted from query string
