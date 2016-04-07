@@ -36,15 +36,17 @@ var server = http.createServer(function(request, response){
 		//console.log("path: "+ path);
 		var id = url.parse(request.url).pathname.split('/')[2];
 		console.log(reqUrl);
+
+		if(reqUrl === "/"){
+			response.end(JSON.stringify({"error": "Invalid Request!!"}))
+		}
 		//Get all items
-		if(reqUrl === '/'){			
+		else if(reqUrl === '/items'){			
 			request.setEncoding('utf8');
 			response.end(JSON.stringify(items));				
 		}
 		//Get a specific item
 		else if(reqUrl === '/items/'+id){
-			// console.log(typeof id);
-			// console.log(id);
 			var item;
 
 			for(i=0; i<items.length; i++){
@@ -113,7 +115,7 @@ var server = http.createServer(function(request, response){
 		
 	}
 
-	else if(request.method === 'POST' && request.url === '/'){
+	else if(request.method === 'POST' && request.url === '/items'){
 
 		var str = "";
 
@@ -172,9 +174,10 @@ var server = http.createServer(function(request, response){
 
 			var id = url.parse(request.url).pathname.split('/')[2];
 
-			if(request.url === '/'){
-				console.log("Deleting all items is dangerous!!");
-				console.log("Are you sure you want to continue?");
+			if(request.url === '/items/delete'){
+				items.length = 0;
+				response.write(JSON.stringify({"Warning": "Deleting all items is dangerous!"}));
+				response.end(JSON.stringify({"Entire List Deleted": items}));
 			}
 
 			if(request.url === '/items/'+id+'/delete'){
@@ -183,6 +186,7 @@ var server = http.createServer(function(request, response){
 
 				for(i=0; i<items.length; i++){
 					if(idExists(parseInt(id))){
+						console.log("Found the item to be deleted!!");
 						items.splice(parseInt(id) - 1,1);
 						break;
 					}
