@@ -184,6 +184,7 @@ var server = http.createServer(function(request, response){
 				for(i=0; i<items.length; i++){
 					if(idExists(parseInt(id))){
 						console.log("Found the item to be deleted!!");
+						console.log("Parsed: " + parseInt(id));
 						items.splice((parseInt(id) - 1),1);
 						break;
 					}
@@ -200,6 +201,7 @@ var server = http.createServer(function(request, response){
 		}
 
 		if(request.url === '/items/'+id+'/edit'){
+			//Check to ensure that id does not already exist and throw error if it does
 
 		}
 
