@@ -23,7 +23,7 @@ var server = http.createServer(function(request, response){
 		response.end();
 		return;
 	}	
-	
+	//Read items
 	if(request.method === 'GET'){
 
 		var reqUrl = request.url;
@@ -50,22 +50,19 @@ var server = http.createServer(function(request, response){
 			var item;
 
 			for(i=0; i<items.length; i++){
-					if(idExists(parseInt(id))){
-						item = JSON.stringify(items[i]);
-						break;
-						//response.end(JSON.stringify(items[i]));	
-					}
-					// else{
-					// 	response.end("Item not found!");
-					// }				
+				if(idExists(parseInt(id))){
+					item = JSON.stringify(items[i]);
+					break;
+					//response.end(JSON.stringify(items[i]));	
 				}
+			}
 			//response.end();	
-				if(item == undefined){
-					response.end(JSON.stringify({"error": "Item not found"}));
-				}
-				else{
-					response.end(item);
-				}
+			if(item == undefined){
+				response.end(JSON.stringify({"error": "Item not found"}));
+			}
+			else{
+				response.end(item);
+			}
 		}
 
 		
@@ -114,7 +111,7 @@ var server = http.createServer(function(request, response){
 		// console.log(request.rawHeaders[1]+" made a GET request");
 		
 	}
-
+	//Create items
 	else if(request.method === 'POST' && request.url === '/items'){
 
 		var str = "";
@@ -169,7 +166,7 @@ var server = http.createServer(function(request, response){
 		});
 
 	}
-
+	//Handle Deletions
 	else if(request.method === 'DELETE'){
 
 			var id = url.parse(request.url).pathname.split('/')[2];
@@ -190,24 +187,27 @@ var server = http.createServer(function(request, response){
 						items.splice(parseInt(id) - 1,1);
 						break;
 					}
-				}	
+				}
+			response.end("Item "+id+" has been deleted!");	
 			}
-			response.end("Item "+id+" has been deleted!");
-		
-	
-		
-		//Parse url to obtain ID to be deleted from query string
-
-		
+					
 	}
-	// else{
-	// 	response.write(request.method);
-	// 	}
-	//response.end();//Terminate connections of incoming requests.
+	
+	//Handle Updates
+	else if(request.method === 'PUT'){
+		if(request.url === '/items'){
 
-	//console.log(request);
+		}
 
-	//Add strings received to messages array
+		if(request.url === '/items/'+id+'/edit'){
+
+		}
+
+	}
+	else{
+		response.end(JSON.stringify({"Error": "Invalid Request"}));
+	}
+
 
 });
 
