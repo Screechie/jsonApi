@@ -184,7 +184,7 @@ var server = http.createServer(function(request, response){
 				for(i=0; i<items.length; i++){
 					if(idExists(parseInt(id))){
 						console.log("Found the item to be deleted!!");
-						items.splice(parseInt(id) - 1,1);
+						items.splice((parseInt(id) - 1),1);
 						break;
 					}
 				}
