@@ -3,6 +3,7 @@ var url = require('url');//module for url resolution and parsing
 var join = require('path').join;//modules for handling and transforming file paths
 var fs = require('fs')//require file stream module
 var qs = require('querystring');//Allow users to perform Get requests using query strings
+var _ = require('lodash');
 
 var items = [];
 var root = __dirname;//Get root directory
@@ -14,6 +15,8 @@ function idExists(searchId){
 		}
 		return false;
 	} 
+
+
 
 var server = http.createServer(function(request, response){
 	
@@ -185,7 +188,10 @@ var server = http.createServer(function(request, response){
 					if(idExists(parseInt(id))){
 						console.log("Found the item to be deleted!!");
 						console.log("Parsed: " + parseInt(id));
-						items.splice((parseInt(id) - 1),1);
+						console.log("index: "+ _.findIndex(id));
+						items.splice(_.findIndex(items,function(element){
+							return element.id === id;
+						}),1);
 						break;
 					}
 				}
