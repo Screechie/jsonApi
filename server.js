@@ -169,21 +169,17 @@ var server = http.createServer(function(request, response){
 		});
 
 	}
+
 	//Handle Deletions
 	else if(request.method === 'DELETE'){
 
 			var id = url.parse(request.url).pathname.split('/')[2];
-
-			// if(items.length = 0){
-			// 	response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
-			// }
 
 			if(request.url === '/items/delete' && items.length > 0){
 				items.length = 0;
 				response.write(JSON.stringify({"Warning": "Deleting all items is dangerous!"}));
 				response.end(JSON.stringify({"Entire List Deleted": items}));
 			}
-
 			else if(request.url === '/items/'+id+'/delete' && items.length > 0){
 
 				console.log("A delete request was made to delete id "+id+"!");
