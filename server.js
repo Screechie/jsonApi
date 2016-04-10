@@ -174,20 +174,24 @@ var server = http.createServer(function(request, response){
 
 			var id = url.parse(request.url).pathname.split('/')[2];
 
-			if(request.url === '/items/delete'){
+			// if(items.length = 0){
+			// 	response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
+			// }
+
+			if(request.url === '/items/delete' && items.length > 0){
 				items.length = 0;
 				response.write(JSON.stringify({"Warning": "Deleting all items is dangerous!"}));
 				response.end(JSON.stringify({"Entire List Deleted": items}));
 			}
 
-			if(request.url === '/items/'+id+'/delete'){
+			else if(request.url === '/items/'+id+'/delete' && items.length > 0){
 
 				console.log("A delete request was made to delete id "+id+"!");
+				console.log("idExists: " + idExists(parseInt(id)));
 
 				for(i=0; i<items.length; i++){
-					if(idExists(parseInt(id))){
+					if(idExists(parseInt(id)) ){
 						console.log("Found the item to be deleted!!");
-						console.log("Parsed: " + parseInt(id));
 						items.splice(_.findIndex(items,function(element){
 							return element.id === parseInt(id);
 						}),1);
@@ -205,6 +209,9 @@ var server = http.createServer(function(request, response){
 
 				
 			response.end("Item "+id+" has been deleted!");	
+			}
+			else{
+				response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
 			}
 					
 	}
