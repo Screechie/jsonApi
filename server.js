@@ -188,13 +188,22 @@ var server = http.createServer(function(request, response){
 					if(idExists(parseInt(id))){
 						console.log("Found the item to be deleted!!");
 						console.log("Parsed: " + parseInt(id));
-						console.log("index: "+ _.findIndex(id));
 						items.splice(_.findIndex(items,function(element){
-							return element.id === id;
+							return element.id === parseInt(id);
 						}),1);
 						break;
 					}
+					else{
+						response.end(JSON.stringify({"Error": "Item does not exist or was deleted previously!"}));
+					}
+										
 				}
+
+				// if(idExists(parseInt(id)) == false){
+				// 	response.end(JSON.stringify({"Error": "Item does not exist or was deleted previously!"}));
+				// }
+
+				
 			response.end("Item "+id+" has been deleted!");	
 			}
 					
