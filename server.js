@@ -2,19 +2,19 @@ const http = require('http');//const http
 var url = require('url');//module for url resolution and parsing
 var join = require('path').join;//modules for handling and transforming file paths
 var fs = require('fs')//require file stream module
-var qs = require('querystring');//Allow users to perform Get requests using query strings
+var qs = require('querystring');//Allow users to perform Get requests using query strings??
 var _ = require('lodash');
 
 var items = [];
 var root = __dirname;//Get root directory
 
 function idExists(searchId){
-		for(i=0; i<items.length;i++){
-			if(items[i].id === searchId)
-				return true;
-		}
-		return false;
-	} 
+	for(i=0; i<items.length;i++){
+		if(items[i].id === searchId)
+			return true;
+	}
+	return false;
+} 
 
 
 
@@ -56,10 +56,8 @@ var server = http.createServer(function(request, response){
 				if(idExists(parseInt(id))){
 					item = JSON.stringify(items[i]);
 					break;
-					//response.end(JSON.stringify(items[i]));	
 				}
 			}
-			//response.end();	
 			if(item == undefined){
 				response.end(JSON.stringify({"error": "Item not found"}));
 			}
@@ -173,43 +171,41 @@ var server = http.createServer(function(request, response){
 	//Handle Deletions
 	else if(request.method === 'DELETE'){
 
-			var id = url.parse(request.url).pathname.split('/')[2];
+		var id = url.parse(request.url).pathname.split('/')[2];
 
-			if(request.url === '/items/delete' && items.length > 0){
-				items.length = 0;
-				response.write(JSON.stringify({"Warning": "Deleting all items is dangerous!"}));
-				response.end(JSON.stringify({"Entire List Deleted": items}));
-			}
-			else if(request.url === '/items/'+id+'/delete' && items.length > 0){
+		if(request.url === '/items/delete' && items.length > 0){
+			items.length = 0;
+			response.write(JSON.stringify({"Warning": "Deleting all items is dangerous!"}));
+			response.end(JSON.stringify({"Entire List Deleted": items}));
+		}
+		else if(request.url === '/items/delete' && items.length == 0){
+			response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
+		}
+		else if(request.url === '/items/'+id+'/delete' && items.length > 0){
 
-				console.log("A delete request was made to delete id "+id+"!");
-				console.log("idExists: " + idExists(parseInt(id)));
+			console.log("A delete request was made to delete id "+id+"!");
+			console.log("idExists: " + idExists(parseInt(id)));
 
-				for(i=0; i<items.length; i++){
-					if(idExists(parseInt(id)) ){
-						console.log("Found the item to be deleted!!");
-						items.splice(_.findIndex(items,function(element){
-							return element.id === parseInt(id);
-						}),1);
-						break;
-					}
-					else{
-						response.end(JSON.stringify({"Error": "Item does not exist or was deleted previously!"}));
-					}
-										
+			for(i=0; i<items.length; i++){
+				if(idExists(parseInt(id))){
+					console.log("Found the item to be deleted!!");
+					items.splice(_.findIndex(items,function(element){
+						return element.id === parseInt(id);
+					}),1);
+					break;
 				}
-
-				// if(idExists(parseInt(id)) == false){
-				// 	response.end(JSON.stringify({"Error": "Item does not exist or was deleted previously!"}));
-				// }
-
-				
-			response.end("Item "+id+" has been deleted!");	
-			}
-			else{
-				response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
-			}
-					
+				else{
+					response.end(JSON.stringify({"Error": "Item does not exist or was deleted previously!"}));
+				}
+			}				
+		response.end("Item "+id+" has been deleted!");	
+		}
+		else if(request.url === '/items/'+id || request.url === '/items'){
+			response.end(JSON.stringify({"Error":"Invalid Request!"}));
+		}
+		else{
+			response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
+		}					
 	}
 	
 	//Handle Updates
@@ -219,10 +215,28 @@ var server = http.createServer(function(request, response){
 		}
 
 		if(request.url === '/items/'+id+'/edit'){
-			//Check to ensure that id does not already exist and throw error if it does
 
-		}
+			var str = "";
+			request.setEncoding("utf8");
 
+			request.on("data", function(chunk){
+				str += chunk;
+			});
+
+			request.on("end", function(){
+				//Check to ensure that id already exists. Direct user to do a post request if id does not exist
+				for(i=0; i<items.length; i++){
+					if(idExists(parseInt(id))){
+						items[i].itemName = str;
+						console.log(items[i].itemName);
+						break;
+					}
+					else{
+						response.end(JSON.stringify({"Error": "Item does not exist.Submit a POST request to create a new item!"}));
+					}
+				}
+			});
+		}		
 	}
 	else{
 		response.end(JSON.stringify({"Error": "Invalid Request"}));
