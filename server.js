@@ -75,36 +75,7 @@ var server = http.createServer(function(request, response){
 		//separate by query string
 		var query = url.parse(request.url,true).query;
 
-		//Return all items if a query string is not specified
-		// if(query == ""){
-		// 	for(i=0;i<items.length;i++)
-		// 	response.end(JSON.stringify({"todo_items": items[i]}));
-		// }
-
-		// console.log("query: ");
-		// console.log(query);
-		// console.log(request);
-		// console.log(request.url);
-
-		// //Parse url for query to obtain specific items from Array
-		// var query = url.parse(request.url).query;
-
-		// console.log("query: ");
-		// console.log(query);
-
-		//Use querystring module to parse query and get separate ids
-		// var id = qs.parse(query);
-		// var item;
-		// console.log(id);
-		// for(i=0;i<id.length;i++){
-		// 	response.end(JSON.stringify({"todo_items": items[i]}));
-		// }
-
-
-
-
-
-
+		
 		// var path = join(root, reqUrl.path);
 		//console.log(reqUrl);
 		// console.log(reqUrl.query);
@@ -149,7 +120,7 @@ var server = http.createServer(function(request, response){
 				currentItem.itemName = item[i];
 				currentItem.id = id;
 
-				//Check if id already exists in the array and change it if necessary to avoid duplicates
+				//Check if id already exists in the array and increment if necessary for uniqueness
 				if(idExists(id))
 					currentItem.id = items[items.length - 1].id + 1;
 
@@ -208,8 +179,11 @@ var server = http.createServer(function(request, response){
 		}					
 	}
 	
-	//Handle Updates
+	//Handle Updates or edit items
 	else if(request.method === 'PUT'){
+
+		var id = url.parse(request.url).pathname.split('/')[2];
+
 		if(request.url === '/items'){
 
 		}
@@ -232,9 +206,10 @@ var server = http.createServer(function(request, response){
 						break;
 					}
 					else{
-						response.end(JSON.stringify({"Error": "Item does not exist.Submit a POST request to create a new item!"}));
-					}
+						response.end(JSON.stringify({"Error": "Item does not exist. Submit a POST request to create a new item!"}));
+					}					
 				}
+				response.end(JSON.stringify({"Upate":"Item update complete!"}));
 			});
 		}		
 	}
