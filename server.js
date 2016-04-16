@@ -14,9 +14,7 @@ function idExists(searchId){
 			return true;
 	}
 	return false;
-} 
-
-
+}
 
 var server = http.createServer(function(request, response){
 	
@@ -31,11 +29,11 @@ var server = http.createServer(function(request, response){
 
 		var reqUrl = request.url;
 		
-		parsedUrl = url.parse(reqUrl);
+		//parsedUrl = url.parse(reqUrl);
 		// console.log(parsedUrl);
 		// console.log( typeof parsedUrl.pathname);
 
-		var path = join(root, parsedUrl.pathname);
+		//var path = join(root, parsedUrl.pathname);
 		//console.log("path: "+ path);
 		var id = url.parse(request.url).pathname.split('/')[2];
 		console.log(reqUrl);
@@ -73,7 +71,7 @@ var server = http.createServer(function(request, response){
 		// console.log(url);
 
 		//separate by query string
-		var query = url.parse(request.url,true).query;
+		//var query = url.parse(request.url,true).query;
 
 		
 		// var path = join(root, reqUrl.path);
@@ -83,60 +81,87 @@ var server = http.createServer(function(request, response){
 		// console.log(request.rawHeaders[1]+" made a GET request");
 		
 	}
-	//Create items
-	else if(request.method === 'POST' && request.url === '/items'){
+	
+	else if(request.method === 'POST'){
 
-		var str = "";
+		var id = url.parse(request.url).pathname.split('/')[2];
 
-		//necessary to receive data as utf-8 strings or buffer objects will be received instead
-		request.setEncoding("utf8");
+		//Create items
+		if(request.url === '/items'){
 
-		request.on("data", function(chunk){
-			str += chunk;
-		});
+			var str = "";
 
-		request.on("end", function(){
+			//necessary to receive data as utf-8 strings or buffer objects will be received instead
+			request.setEncoding("utf8");
 
-			//List item object
-			var list_Item = function(){
-				this.itemName = "";
-				this.id = 0;
-			};	
+			request.on("data", function(chunk){
+				str += chunk;
+			});
 
-			/*Split stream by new line character to get separate
-			TODO items and then push them to the Array*/
-			var item = str.split('\n');
+			request.on("end", function(){
 
-			console.log("The items entered were: ");
+				//List item object
+				var list_Item = function(){
+					this.itemName = "";
+					this.id = 0;
+				};	
 
-			for(i=0; i<item.length; i++){
+				/*Split stream by new line character to get separate
+				TODO items and then push them to the Array*/
+				var item = str.split('\n');
 
-				//Needs to be inside loop in order for a new object to be created on each iteration
-				var currentItem = new list_Item();
+				console.log("The items entered were: ");
 
-				var id = i + 1;
+				for(i=0; i<item.length; i++){
 
-				//set values of current item for each item
-				currentItem.itemName = item[i];
-				currentItem.id = id;
+					//Needs to be inside loop in order for a new object to be created on each iteration
+					var currentItem = new list_Item();
 
-				//Check if id already exists in the array and increment if necessary for uniqueness
-				if(idExists(id))
-					currentItem.id = items[items.length - 1].id + 1;
+					var id = i + 1;
 
-				items.push(currentItem);
-			}			
+					//set values of current item for each item
+					currentItem.itemName = item[i];
+					currentItem.id = id;
 
-			console.log("The user entered the following items: ");
-			for(i=0;i<items.length;i++){
-				console.log(items[i]);
+					//Check if id already exists in the array and increment if necessary for uniqueness
+					if(idExists(id))
+						currentItem.id = items[items.length - 1].id + 1;
+
+					items.push(currentItem);
+				}			
+
+				console.log("The user entered the following items: ");
+				for(i=0;i<items.length;i++){
+					console.log(items[i]);
+				}
+
+				console.log(JSON.stringify({"todo_items": items}));
+				response.end(JSON.stringify({"todo_items": items}));
+			});
+		}
+		if(request.url === '/items/'+id){
+			//Check to ensure that id does not already exist. Throw error if it does!
+			for(i=0; i<items.length; i++){
+				if(idExists(parseInt(id))){
+					response.end(JSON.stringify({"Error":"You can not create a new item with an id that already exists!"}));
+					break;
+				}
+				else{
+					//Insert item in corresponding position according to id
+
+					//sort array by ascending order
+
+					//check for value 1 less than id and item 1 more than id
+					var lessIndex = indexOf(id - 1);
+					console.log(lessIndex);
+
+					//insert item at index between less and more value
+				}
 			}
+			
 
-			console.log(JSON.stringify({"todo_items": items}));
-			response.end(JSON.stringify({"todo_items": items}));
 
-		});
-
+		}
 	}
 
 	//Handle Deletions
@@ -175,7 +200,7 @@ var server = http.createServer(function(request, response){
 			response.end(JSON.stringify({"Error":"Invalid Request!"}));
 		}
 		else{
-			response.end(JSON.stringify({"Error":"ItemStore is already empty!!"}));
+			response.end(JSON.stringify({"Error":"ItemStore is empty!!"}));
 		}					
 	}
 	
@@ -211,13 +236,11 @@ var server = http.createServer(function(request, response){
 				}
 				response.end(JSON.stringify({"Upate":"Item update complete!"}));
 			});
+		}
+		else{
+			response.end(JSON.stringify({"Error": "Invalid Request"}));
 		}		
 	}
-	else{
-		response.end(JSON.stringify({"Error": "Invalid Request"}));
-	}
-
-
 });
 
 //Updates
